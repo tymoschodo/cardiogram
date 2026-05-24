@@ -195,12 +195,27 @@ input[type=range]::-moz-range-thumb{
     </div>
   </div>
 
+  <div class="card">
+    <div class="sound-row">
+      <div class="sound-info">
+        <span>Start score on next Set</span>
+        <small>Opens score viewer in a new window and starts scrolling</small>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="scoreToggle" onchange="saveScoreToggle()"/>
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
+  </div>
+
 </div>
 
 <script>
 function getBPM(){return Math.min(220,Math.max(20,parseInt(localStorage.getItem('pulse_bpm')||'72')));}
 function saveBPM(v){localStorage.setItem('pulse_bpm',v);}
 function saveSound(){localStorage.setItem('pulse_sound',document.getElementById('soundToggle').checked?'1':'0');}
+function saveScoreToggle(){localStorage.setItem('score_prompt',document.getElementById('scoreToggle').checked?'1':'0');}
 
 const ZONES=[
   [20,50,'Bradycardia'],
@@ -228,7 +243,15 @@ function setBPM(v){
     b.classList.toggle('on',parseInt(b.textContent.trim())===v);
   });
 }
-function applyNum(){setBPM(+document.getElementById('numIn').value);}
+function applyNum(){
+  setBPM(+document.getElementById('numIn').value);
+  if(document.getElementById('scoreToggle').checked){
+    localStorage.setItem('score_autostart','1');
+    window.open('score.html','scoreWindow','width=1280,height=400');
+    document.getElementById('scoreToggle').checked=false;
+    saveScoreToggle();
+  }
+}
 document.getElementById('numIn').addEventListener('keydown',e=>{if(e.key==='Enter')applyNum();});
 function setP(v){setBPM(v);}
 
@@ -236,6 +259,8 @@ const initBPM=getBPM();
 setBPM(initBPM);
 const snd=localStorage.getItem('pulse_sound');
 document.getElementById('soundToggle').checked=snd===null||snd==='1';
+const scp=localStorage.getItem('score_prompt');
+document.getElementById('scoreToggle').checked=scp==='1';
 </script>
 </body>
 </html>
