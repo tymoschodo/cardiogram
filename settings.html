@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Setienia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{
+  min-height:100%;background:#f5f5f3;
+  font-family:'Inter',sans-serif;color:#111;
+}
+body{padding:2.5rem 1rem 4rem}
+
+.wrap{width:min(480px,100%);margin:0 auto;display:flex;flex-direction:column;gap:0}
+
+/* header */
+.header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:2.5rem
+}
+.header h1{font-size:1.1rem;font-weight:600;letter-spacing:-0.01em;color:#111}
+.back-btn{
+  display:inline-flex;align-items:center;gap:0.4rem;
+  text-decoration:none;color:#666;font-size:0.8rem;
+  border:1px solid #ddd;border-radius:6px;padding:0.4rem 0.85rem;
+  transition:all 0.15s;background:#fff
+}
+.back-btn:hover{border-color:#aaa;color:#111}
+
+/* BPM hero */
+.bpm-hero{
+  background:#fff;border:1px solid #e5e5e3;border-radius:16px;
+  padding:2rem 1.5rem 1.75rem;margin-bottom:1rem;text-align:center
+}
+.bpm-number{
+  font-size:clamp(4rem,16vw,6rem);font-weight:600;
+  letter-spacing:-0.04em;line-height:1;color:#111;
+  transition:transform 0.06s ease
+}
+.bpm-number.pulse{transform:scale(1.04)}
+.bpm-label{font-size:0.7rem;letter-spacing:0.12em;color:#999;margin-top:0.35rem;text-transform:uppercase}
+
+/* cards */
+.card{
+  background:#fff;border:1px solid #e5e5e3;border-radius:12px;
+  padding:1.25rem 1.5rem;margin-bottom:1rem
+}
+.card-title{font-size:0.7rem;font-weight:500;letter-spacing:0.08em;color:#999;text-transform:uppercase;margin-bottom:1.1rem}
+
+/* manual input */
+.input-row{display:flex;align-items:center;gap:0.75rem}
+input[type=number]{
+  width:90px;padding:0.55rem 0.75rem;
+  border:1px solid #ddd;border-radius:8px;
+  font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:500;
+  color:#111;background:#f9f9f7;text-align:center;outline:none;
+  -moz-appearance:textfield;transition:border-color 0.2s
+}
+input[type=number]:focus{border-color:#111;background:#fff}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+button.set{
+  padding:0.55rem 1.1rem;border-radius:8px;
+  background:#111;color:#fff;border:none;
+  font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;
+  cursor:pointer;transition:background 0.15s
+}
+button.set:hover{background:#333}
+.range-hint{display:flex;justify-content:space-between;font-size:0.7rem;color:#bbb;margin-top:0.5rem}
+
+/* slider */
+input[type=range]{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:3px;background:#e5e5e3;
+  border-radius:2px;outline:none;cursor:pointer;margin-bottom:0.25rem
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  background:#111;border:2px solid #fff;
+  box-shadow:0 1px 4px rgba(0,0,0,0.18);
+  transition:transform 0.1s
+}
+input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.15)}
+input[type=range]::-moz-range-thumb{
+  width:18px;height:18px;border-radius:50%;
+  background:#111;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.18);border:none
+}
+
+/* presets */
+.presets{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem}
+.pre{
+  border:1px solid #e5e5e3;border-radius:8px;
+  background:#f9f9f7;color:#555;
+  font-family:'Inter',sans-serif;
+  font-size:0.9rem;font-weight:500;
+  padding:0.65rem 0.25rem 0.5rem;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:0.15rem;
+  transition:all 0.12s
+}
+.pre small{font-size:0.58rem;font-weight:400;color:#bbb;text-transform:uppercase;letter-spacing:0.05em}
+.pre:hover{border-color:#aaa;background:#fff;color:#111}
+.pre.on{border-color:#111;background:#111;color:#fff}
+.pre.on small{color:rgba(255,255,255,0.5)}
+
+/* sound toggle */
+.sound-row{display:flex;align-items:center;justify-content:space-between}
+.sound-info{display:flex;flex-direction:column;gap:0.2rem}
+.sound-info span{font-size:0.9rem;font-weight:500;color:#111}
+.sound-info small{font-size:0.75rem;color:#999}
+.toggle{position:relative;width:44px;height:24px;cursor:pointer;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-track{
+  position:absolute;inset:0;background:#ddd;border-radius:12px;transition:background 0.2s
+}
+.toggle input:checked~.toggle-track{background:#111}
+.toggle-thumb{
+  position:absolute;top:3px;left:3px;
+  width:18px;height:18px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);
+  transition:left 0.2s
+}
+.toggle input:checked~.toggle-thumb{left:23px}
+
+/* zone strip */
+.zone-strip{
+  height:6px;border-radius:3px;margin-top:0.75rem;
+  background:linear-gradient(to right,#5b8def 0%,#4ecb71 25%,#f5c542 50%,#f07033 75%,#e03434 100%)
+}
+.zone-label{
+  font-size:0.72rem;color:#888;margin-top:0.5rem;
+  display:flex;justify-content:space-between
+}
+.zone-cur{font-size:0.72rem;color:#111;font-weight:500;margin-top:0.35rem;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <h1>Heart Rate Settings</h1>
+    <a class="back-btn" href="index.html">← Monitor</a>
+  </div>
+
+  <div class="bpm-hero">
+    <div class="bpm-number" id="big">72</div>
+    <div class="bpm-label">beats per minute</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Enter value</div>
+    <div class="input-row">
+      <input type="number" id="numIn" min="20" max="220" value="72"/>
+      <button class="set" onclick="applyNum()">Set</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Slider</div>
+    <input type="range" id="slid" min="20" max="220" value="72" oninput="setBPM(+this.value)"/>
+    <div class="range-hint"><span>20</span><span>220</span></div>
+    <div class="zone-strip"></div>
+    <div class="zone-label"><span>rest</span><span>moderate</span><span>maximum</span></div>
+    <div class="zone-cur" id="zoneCur">Normal</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Presets</div>
+    <div class="presets">
+      <button class="pre" onclick="setP(40)"><small>rest</small>40</button>
+      <button class="pre" onclick="setP(60)"><small>low</small>60</button>
+      <button class="pre" onclick="setP(72)"><small>normal</small>72</button>
+      <button class="pre" onclick="setP(100)"><small>light</small>100</button>
+      <button class="pre" onclick="setP(120)"><small>active</small>120</button>
+      <button class="pre" onclick="setP(140)"><small>cardio</small>140</button>
+      <button class="pre" onclick="setP(160)"><small>high</small>160</button>
+      <button class="pre" onclick="setP(200)"><small>max</small>200</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sound-row">
+      <div class="sound-info">
+        <span>Pulse sound</span>
+        <small>Click synced with each heartbeat</small>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="soundToggle" checked onchange="saveSound()"/>
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function getBPM(){return Math.min(220,Math.max(20,parseInt(localStorage.getItem('pulse_bpm')||'72')));}
+function saveBPM(v){localStorage.setItem('pulse_bpm',v);}
+function saveSound(){localStorage.setItem('pulse_sound',document.getElementById('soundToggle').checked?'1':'0');}
+
+const ZONES=[
+  [20,50,'Bradycardia'],
+  [51,70,'Resting'],
+  [71,85,'Normal'],
+  [86,110,'Light effort'],
+  [111,140,'Moderate'],
+  [141,170,'Cardio'],
+  [171,200,'Intense'],
+  [201,220,'Maximum'],
+];
+function zoneName(v){
+  for(const [lo,hi,n] of ZONES) if(v>=lo&&v<=hi) return n;
+  return '';
+}
+
+function setBPM(v){
+  v=Math.min(220,Math.max(20,parseInt(v)||72));
+  document.getElementById('big').textContent=v;
+  document.getElementById('numIn').value=v;
+  document.getElementById('slid').value=v;
+  document.getElementById('zoneCur').textContent=zoneName(v);
+  saveBPM(v);
+  document.querySelectorAll('.pre').forEach(b=>{
+    b.classList.toggle('on',parseInt(b.textContent.trim())===v);
+  });
+}
+function applyNum(){setBPM(+document.getElementById('numIn').value);}
+document.getElementById('numIn').addEventListener('keydown',e=>{if(e.key==='Enter')applyNum();});
+function setP(v){setBPM(v);}
+
+const initBPM=getBPM();
+setBPM(initBPM);
+const snd=localStorage.getItem('pulse_sound');
+document.getElementById('soundToggle').checked=snd===null||snd==='1';
+</script>
+</body>
+</html>
