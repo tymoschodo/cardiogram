@@ -8,504 +8,398 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Courier New',monospace}
 
-/* ── DROP OVERLAY ── */
-#drop-zone{
-  position:fixed;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:1.5rem;
-  background:#000;z-index:10;transition:background 0.2s
-}
-#drop-zone.drag-over{background:#0a0a0a}
-#drop-zone.hidden{display:none}
+canvas{display:block;width:100%;height:100%;position:fixed;inset:0}
 
-.drop-box{
-  border:1px solid rgba(255,255,255,0.15);border-radius:12px;
-  padding:3rem 4rem;text-align:center;cursor:pointer;
-  transition:border-color 0.2s
-}
-.drop-box:hover,.drag-over .drop-box{border-color:rgba(255,255,255,0.4)}
-.drop-icon{font-size:2.5rem;margin-bottom:1rem;opacity:0.4}
-.drop-title{font-size:1rem;color:rgba(255,255,255,0.7);letter-spacing:0.05em;margin-bottom:0.4rem}
-.drop-sub{font-size:0.7rem;color:rgba(255,255,255,0.25);letter-spacing:0.08em}
-#file-input{display:none}
-
-.nav-links{display:flex;gap:1rem}
-.nav-link{
-  color:rgba(255,255,255,0.2);font-size:0.65rem;letter-spacing:0.15em;
-  text-decoration:none;border:1px solid rgba(255,255,255,0.1);
-  padding:0.4rem 0.8rem;border-radius:4px;transition:all 0.2s
-}
-.nav-link:hover{color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.3)}
-
-/* ── SCORE VIEW ── */
-#score-view{position:fixed;inset:0;display:none;flex-direction:column}
-#score-view.visible{display:flex}
-
-canvas#score-canvas{display:block;flex:1;width:100%;background:#000}
-
-/* HUD */
 #hud{
   position:fixed;bottom:0;left:0;right:0;
-  display:flex;align-items:center;gap:1rem;
-  padding:10px 16px;background:rgba(0,0,0,0.85);
-  border-top:1px solid rgba(255,255,255,0.06)
+  display:flex;align-items:center;gap:0.75rem;
+  padding:8px 16px;background:rgba(0,0,0,0.9);
+  border-top:1px solid rgba(255,255,255,0.06);z-index:10
 }
-.hud-bpm{font-size:0.7rem;color:rgba(255,255,255,0.3);letter-spacing:0.1em}
+.hud-bpm{font-size:0.68rem;color:rgba(255,255,255,0.3);letter-spacing:0.1em}
 .hud-bpm span{color:rgba(255,255,255,0.7)}
 .hud-btn{
   background:transparent;border:1px solid rgba(255,255,255,0.12);
   color:rgba(255,255,255,0.3);font-family:'Courier New',monospace;
-  font-size:0.62rem;letter-spacing:0.1em;padding:0.3rem 0.7rem;
-  cursor:pointer;border-radius:3px;transition:all 0.15s
+  font-size:0.62rem;letter-spacing:0.08em;padding:0.3rem 0.65rem;
+  cursor:pointer;border-radius:3px;transition:all 0.15s;text-decoration:none;
+  display:inline-flex;align-items:center
 }
 .hud-btn:hover{border-color:rgba(255,255,255,0.35);color:rgba(255,255,255,0.7)}
 .hud-spacer{flex:1}
 .hud-pos{font-size:0.65rem;color:rgba(255,255,255,0.2);letter-spacing:0.05em}
-
-/* error */
-#err{
-  position:fixed;bottom:60px;left:50%;transform:translateX(-50%);
-  background:#1a0000;border:1px solid rgba(255,50,50,0.3);
-  color:rgba(255,100,100,0.8);font-size:0.7rem;padding:0.5rem 1rem;
-  border-radius:4px;display:none;letter-spacing:0.05em
-}
 </style>
 </head>
 <body>
-
-<!-- DROP SCREEN -->
-<div id="drop-zone">
-  <div class="drop-box" onclick="document.getElementById('file-input').click()">
-    <div class="drop-icon">𝄞</div>
-    <div class="drop-title">DROP MUSICXML HERE</div>
-    <div class="drop-sub">OR CLICK TO BROWSE · .XML / .MXL / .MUSICXML</div>
-  </div>
-  <div class="nav-links">
-    <a class="nav-link" href="index.html">← MONITOR</a>
-    <a class="nav-link" href="settings.html">SETTINGS</a>
-  </div>
-  <input type="file" id="file-input" accept=".xml,.mxl,.musicxml"/>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="hud-bpm">BPM <span id="hud-bpm">72</span></div>
+  <button class="hud-btn" id="play-btn" onclick="togglePlay()">▶ PLAY</button>
+  <button class="hud-btn" onclick="resetScroll()">⟵ RESET</button>
+  <div class="hud-spacer"></div>
+  <div class="hud-pos" id="hud-pos">BAR 1</div>
+  <a class="hud-btn" href="settings.html">SETTINGS</a>
+  <a class="hud-btn" href="index.html">MONITOR</a>
+  <button class="hud-btn" onclick="toggleFS()">⛶</button>
 </div>
-
-<!-- SCORE VIEW -->
-<div id="score-view">
-  <canvas id="score-canvas"></canvas>
-  <div id="hud">
-    <div class="hud-bpm">BPM <span id="hud-bpm-val">72</span></div>
-    <button class="hud-btn" id="play-btn" onclick="togglePlay()">▶ PLAY</button>
-    <button class="hud-btn" onclick="resetScroll()">⟵ RESET</button>
-    <div class="hud-spacer"></div>
-    <div class="hud-pos" id="hud-pos">BAR 1</div>
-    <button class="hud-btn" onclick="reloadFile()">LOAD NEW</button>
-    <a class="hud-btn" href="index.html" style="text-decoration:none">MONITOR</a>
-    <button class="hud-btn" onclick="toggleFS()">⛶</button>
-  </div>
-</div>
-
-<div id="err"></div>
 
 <script>
-// ═══════════════════════════════════════════════
-// MUSICXML PARSER
-// ═══════════════════════════════════════════════
+// ── JSZip inline (minified subset for unzip) ──
+// We'll use a lightweight approach: fetch the embedded MXL, unzip via DecompressionStream
+// For MXL files: they are ZIP files containing score.xml
 
+const MXL_B64 = "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";
+
+// ── Parse MXL ──
+async function unzipMXL(b64) {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  // Use JSZip loaded from CDN
+  return bytes;
+}
+
+// ── MusicXML Parser ──
 function parseMusicXML(xmlStr) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(xmlStr, 'application/xml');
-  if (doc.querySelector('parsererror')) throw new Error('Invalid XML');
-
   const notes = [];
   let divisions = 1;
   let currentTick = 0;
-  let measureNum = 0;
   const measureStartTicks = [];
+  let beatsPerMeasure = 4, beatType = 4;
 
-  // collect parts — use first part only
   const part = doc.querySelector('part');
-  if (!part) throw new Error('No part found in MusicXML');
+  if (!part) throw new Error('No part');
 
-  const measures = part.querySelectorAll('measure');
-
-  measures.forEach(measure => {
-    measureNum++;
+  part.querySelectorAll('measure').forEach((measure, mi) => {
     measureStartTicks.push(currentTick);
-
-    // update divisions if present
     const divEl = measure.querySelector('divisions');
-    if (divEl) divisions = parseInt(divEl.textContent) || 1;
+    if (divEl) divisions = parseInt(divEl.textContent)||1;
+    const bEl = measure.querySelector('beats');
+    const btEl = measure.querySelector('beat-type');
+    if (bEl) beatsPerMeasure = parseInt(bEl.textContent)||4;
+    if (btEl) beatType = parseInt(btEl.textContent)||4;
 
-    // time signature
-    const beatsEl = measure.querySelector('beats');
-    const beatTypeEl = measure.querySelector('beat-type');
-    let beatsPerMeasure = beatsEl ? parseInt(beatsEl.textContent) : 4;
-    let beatType = beatTypeEl ? parseInt(beatTypeEl.textContent) : 4;
+    let mTick = currentTick;
+    measure.querySelectorAll('note').forEach(n => {
+      const dur = parseInt(n.querySelector('duration')?.textContent||'0');
+      const isChord = !!n.querySelector('chord');
+      const isRest = !!n.querySelector('rest');
+      const isGrace = !!n.querySelector('grace');
+      const stemDir = n.querySelector('stem')?.textContent||'up';
+      const noteType = n.querySelector('type')?.textContent||'quarter';
 
-    let measureTick = currentTick;
+      const tick = isChord
+        ? (notes.length>0 ? notes[notes.length-1].tick : mTick)
+        : mTick;
 
-    // process notes and rests
-    measure.querySelectorAll('note').forEach(noteEl => {
-      const durationEl = noteEl.querySelector('duration');
-      const dur = durationEl ? parseInt(durationEl.textContent) : 0;
-      const isChord = !!noteEl.querySelector('chord');
-      const isRest = !!noteEl.querySelector('rest');
-      const isGrace = !!noteEl.querySelector('grace');
-
-      if (isChord) {
-        // chord note: same tick as previous
-      } else {
-        measureTick = isGrace ? measureTick : measureTick;
-      }
-
-      let tick = isChord ? (notes.length > 0 ? notes[notes.length - 1].tick : measureTick) : measureTick;
-
-      if (!isRest) {
-        const pitchEl = noteEl.querySelector('pitch');
-        if (pitchEl) {
-          const step = pitchEl.querySelector('step')?.textContent || 'C';
-          const octave = parseInt(pitchEl.querySelector('octave')?.textContent || '4');
-          const alter = parseFloat(pitchEl.querySelector('alter')?.textContent || '0');
-          const midi = stepOctaveToMidi(step, octave, alter);
-          notes.push({ tick, dur, midi, step, octave, alter, measure: measureNum, isChord });
+      if (!isRest && !isGrace) {
+        const p = n.querySelector('pitch');
+        if (p) {
+          const step = p.querySelector('step')?.textContent||'C';
+          const octave = parseInt(p.querySelector('octave')?.textContent||'4');
+          const alter = parseFloat(p.querySelector('alter')?.textContent||'0');
+          const midi = stepToMidi(step,octave,alter);
+          notes.push({tick, dur, midi, step, octave, alter, stemDir, noteType, isChord, measure:mi+1});
         }
       }
-
-      if (!isChord && !isGrace) measureTick += dur;
+      if (!isChord && !isGrace) mTick += dur;
     });
 
-    // advance by measure duration
-    const measureDurTicks = (beatsPerMeasure * divisions * 4) / beatType;
-    currentTick += measureDurTicks;
+    const measDur = (beatsPerMeasure * divisions * 4) / beatType;
+    currentTick += measDur;
   });
 
-  return { notes, divisions, measureStartTicks, totalTicks: currentTick };
+  return {notes, divisions, measureStartTicks, totalTicks:currentTick, beatsPerMeasure, beatType};
 }
 
-function stepOctaveToMidi(step, octave, alter) {
-  const steps = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
-  return (octave + 1) * 12 + (steps[step] || 0) + Math.round(alter);
+function stepToMidi(step,octave,alter){
+  const s={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+  return (octave+1)*12+(s[step]||0)+Math.round(alter);
 }
 
-// ═══════════════════════════════════════════════
-// RENDERER
-// ═══════════════════════════════════════════════
-
-const canvas = document.getElementById('score-canvas');
+// ── Renderer ──
+const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 
-// Staff params
-const STAFF_LINES = 5;
-const LINE_SPACING = 14;      // px between staff lines
-const STAFF_HEIGHT = LINE_SPACING * (STAFF_LINES - 1); // 56
-const STAFF_TOP_PADDING = 60; // space above top line
-const HEAD_R = LINE_SPACING * 0.42;
-const STEM_H = LINE_SPACING * 3.2;
+const LS = 16;           // line spacing px
+const HEAD_RX = LS*0.52;
+const HEAD_RY = LS*0.38;
+const STEM_H  = LS*3.5;
+const PX_PER_QUARTER = 100; // px per quarter note
 
-// The note that sits on the middle (3rd) staff line = B4 (midi 71)
-// We use: y = staffTop + (B4_midi - midi) * (LINE_SPACING/2)
-// Middle line y = staffTop + 2*LINE_SPACING
-const MIDDLE_LINE_MIDI = 71; // B4
+// Middle line = B4 (midi 71), 3rd line from top
+const MID_MIDI = 71;
 
 let scoreData = null;
-let scrollX = 0;        // current scroll in px (increases rightward = notes move left)
+let scrollX = 0;
 let playing = false;
 let lastTs = null;
-let raf = null;
-let ticksPerPx = 1;     // will be computed from BPM
-let currentBar = 1;
 
-// pixels per quarter note — set so that at 72 BPM, scrolling feels musical
-// We'll compute from BPM: speed = (BPM/60) * px_per_quarter
-// px_per_quarter = fixed (e.g. 80px)
-const PX_PER_QUARTER = 90; // px per quarter note duration
+function getBPM(){return Math.min(220,Math.max(20,parseInt(localStorage.getItem('pulse_bpm')||'72')));}
+function getSpeed(){return (getBPM()/60)*PX_PER_QUARTER;}
 
-function getBPM() {
-  return Math.min(220, Math.max(20, parseInt(localStorage.getItem('pulse_bpm') || '72')));
+function resize(){
+  canvas.width  = canvas.offsetWidth*devicePixelRatio;
+  canvas.height = canvas.offsetHeight*devicePixelRatio;
 }
+window.addEventListener('resize',resize);
+resize();
 
-// pixels per second = (BPM/60) * PX_PER_QUARTER
-function getSpeed() {
-  return (getBPM() / 60) * PX_PER_QUARTER;
-}
-
-function resize() {
-  canvas.width = canvas.offsetWidth * devicePixelRatio;
-  canvas.height = canvas.offsetHeight * devicePixelRatio;
-}
-window.addEventListener('resize', resize);
-
-// ── draw one frame ──
-function draw(ts) {
-  if (lastTs !== null && playing) {
-    const dt = Math.min(ts - lastTs, 50);
-    scrollX += getSpeed() * (dt / 1000);
+function draw(ts){
+  if(lastTs!==null && playing){
+    const dt=Math.min(ts-lastTs,50);
+    scrollX += getSpeed()*(dt/1000);
   }
-  lastTs = ts;
+  lastTs=ts;
 
-  const W = canvas.offsetWidth;
-  const H = canvas.offsetHeight;
-  const dpr = devicePixelRatio;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, W, H);
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, W, H);
+  const W=canvas.offsetWidth, H=canvas.offsetHeight;
+  const dpr=devicePixelRatio;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle='#000';
+  ctx.fillRect(0,0,W,H);
 
-  if (!scoreData) { raf = requestAnimationFrame(draw); return; }
+  if(!scoreData){requestAnimationFrame(draw);return;}
 
-  const { notes, divisions, measureStartTicks, totalTicks } = scoreData;
+  const {notes,divisions,measureStartTicks} = scoreData;
+  const pxPerTick = PX_PER_QUARTER/divisions;
 
-  // staff vertical center
-  const staffTop = H / 2 - STAFF_HEIGHT / 2 - LINE_SPACING;
-  const staffBottom = staffTop + STAFF_HEIGHT;
-  const midLineY = staffTop + 2 * LINE_SPACING; // 3rd line from top
+  // Staff — vertically centered, shifted slightly above center to leave ledger room below
+  const staffTop = H*0.5 - LS*3.5;
+  const staffBot = staffTop + LS*4;
+  const midLineY = staffTop + LS*2; // 3rd line (0-indexed from top)
+  const cursorX  = W*0.18;
 
-  // cursor x position (where the "now" line is)
-  const cursorX = W * 0.22;
-
-  // ticks per px
-  const tpp = 1 / PX_PER_QUARTER * divisions; // ticks per px = divisions / PX_PER_QUARTER... wait:
-  // scrollX px = elapsed time * speed. At scrollX, the tick shown at cursorX is:
-  // currentTick = scrollX * (divisions / PX_PER_QUARTER)
-  const pxPerTick = PX_PER_QUARTER / divisions;
-
-  // ── STAFF LINES ──
-  ctx.strokeStyle = 'rgba(255,255,255,0.55)';
-  ctx.lineWidth = 1;
-  for (let i = 0; i < STAFF_LINES; i++) {
-    const y = staffTop + i * LINE_SPACING;
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  // ── Staff lines ──
+  ctx.strokeStyle='rgba(255,255,255,0.5)';
+  ctx.lineWidth=1;
+  for(let i=0;i<5;i++){
+    const y=staffTop+i*LS;
+    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
   }
 
-  // ── CURSOR LINE ──
-  ctx.strokeStyle = 'rgba(255,30,60,0.6)';
-  ctx.lineWidth = 1.5;
-  ctx.setLineDash([4, 4]);
-  ctx.beginPath(); ctx.moveTo(cursorX, staffTop - 24); ctx.lineTo(cursorX, staffBottom + 24); ctx.stroke();
+  // ── Cursor ──
+  ctx.strokeStyle='rgba(255,30,60,0.5)';
+  ctx.lineWidth=1.5;
+  ctx.setLineDash([3,5]);
+  ctx.beginPath();ctx.moveTo(cursorX,staffTop-LS*4);ctx.lineTo(cursorX,staffBot+LS*3);ctx.stroke();
   ctx.setLineDash([]);
 
-  // ── BARLINES ──
-  ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-  ctx.lineWidth = 1;
-  measureStartTicks.forEach((tick, i) => {
-    const x = cursorX + (tick * pxPerTick) - scrollX;
-    if (x < -2 || x > W + 2) return;
-    ctx.beginPath(); ctx.moveTo(x, staffTop); ctx.lineTo(x, staffBottom); ctx.stroke();
-
-    // bar number
-    if (x > 20 && x < W - 20) {
-      ctx.fillStyle = 'rgba(255,255,255,0.18)';
-      ctx.font = '10px Courier New';
-      ctx.textAlign = 'center';
-      ctx.fillText(i + 1, x, staffTop - 8);
+  // ── Barlines + bar numbers ──
+  const curTick = scrollX/pxPerTick;
+  let currentBar=1;
+  measureStartTicks.forEach((tick,i)=>{
+    const x=cursorX+(tick*pxPerTick)-scrollX;
+    if(x<-2||x>W+2) return;
+    ctx.strokeStyle='rgba(255,255,255,0.25)';
+    ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x,staffTop);ctx.lineTo(x,staffBot);ctx.stroke();
+    if(x>30&&x<W-10){
+      ctx.fillStyle='rgba(255,255,255,0.2)';
+      ctx.font=`10px Courier New`;
+      ctx.textAlign='center';
+      ctx.fillText(i+1,x,staffTop-10);
     }
+    if(tick<=curTick) currentBar=i+1;
   });
 
-  // ── current bar for HUD ──
-  {
-    const curTick = scrollX / pxPerTick;
-    let bar = 1;
-    for (let i = 0; i < measureStartTicks.length; i++) {
-      if (measureStartTicks[i] <= curTick) bar = i + 1;
-    }
-    currentBar = bar;
-    document.getElementById('hud-pos').textContent = `BAR ${bar} / ${measureStartTicks.length}`;
-  }
+  document.getElementById('hud-pos').textContent=`BAR ${currentBar} / ${measureStartTicks.length}`;
+  document.getElementById('hud-bpm').textContent=getBPM();
 
-  // ── NOTES ──
-  notes.forEach(note => {
-    const x = cursorX + (note.tick * pxPerTick) - scrollX;
-    if (x < -60 || x > W + 60) return;
+  // ── Notes ──
+  notes.forEach(note=>{
+    const x=cursorX+(note.tick*pxPerTick)-scrollX;
+    if(x<-80||x>W+80) return;
 
-    // y position: semitones from middle line midi
-    const semiDiff = MIDDLE_LINE_MIDI - note.midi;
-    const y = midLineY + semiDiff * (LINE_SPACING / 2);
+    // semitone distance from middle line midi (B4)
+    const semi = MID_MIDI - note.midi;
+    // each step = half line spacing (semitone), but we use diatonic steps for visual:
+    // Actually use chromatic mapping: y per semitone = LS/2
+    const y = midLineY + semi*(LS/2);
 
-    // ledger lines
-    drawLedgerLines(x, y, staffTop, staffBottom);
-
-    // note head
     const isPast = x < cursorX;
-    ctx.fillStyle = isPast ? 'rgba(255,255,255,0.25)' : '#fff';
-    ctx.strokeStyle = isPast ? 'rgba(255,255,255,0.25)' : '#fff';
+    const col = isPast ? 'rgba(255,255,255,0.2)' : '#fff';
+    ctx.strokeStyle=col;
+    ctx.fillStyle=col;
 
-    // filled oval
+    // ── Ledger lines ──
+    // above top staff line (staffTop)
+    for(let ly=staffTop-LS; ly>=y-1; ly-=LS){
+      if(Math.abs(ly-y)<LS*0.55){
+        ctx.lineWidth=1.2;
+        ctx.beginPath();ctx.moveTo(x-HEAD_RX*1.8,ly);ctx.lineTo(x+HEAD_RX*1.8,ly);ctx.stroke();
+      }
+    }
+    // below bottom staff line (staffBot)
+    for(let ly=staffBot+LS; ly<=y+1; ly+=LS){
+      if(Math.abs(ly-y)<LS*0.55){
+        ctx.lineWidth=1.2;
+        ctx.beginPath();ctx.moveTo(x-HEAD_RX*1.8,ly);ctx.lineTo(x+HEAD_RX*1.8,ly);ctx.stroke();
+      }
+    }
+    // middle ledger (C4) if needed
+    const c4y = midLineY + (MID_MIDI-60)*(LS/2);
+    if(Math.abs(y-c4y)<2 && (c4y<staffTop-1||c4y>staffBot+1)){
+      ctx.lineWidth=1.2;
+      ctx.beginPath();ctx.moveTo(x-HEAD_RX*1.8,c4y);ctx.lineTo(x+HEAD_RX*1.8,c4y);ctx.stroke();
+    }
+
+    // ── Note head ──
     ctx.beginPath();
-    ctx.ellipse(x, y, HEAD_R * 1.3, HEAD_R, -0.2, 0, Math.PI * 2);
+    ctx.ellipse(x,y,HEAD_RX,HEAD_RY,-0.15,0,Math.PI*2);
     ctx.fill();
 
-    // stem (up if midi < B4=71, down if >= 71, roughly)
-    if (note.dur > 0) {
-      const stemUp = note.midi < 71;
-      ctx.lineWidth = 1.2;
+    // ── Stem ──
+    const stemUp = note.stemDir==='up';
+    ctx.lineWidth=1.3;
+    ctx.beginPath();
+    if(stemUp){
+      ctx.moveTo(x+HEAD_RX*0.85,y-HEAD_RY*0.3);
+      ctx.lineTo(x+HEAD_RX*0.85,y-STEM_H);
+    } else {
+      ctx.moveTo(x-HEAD_RX*0.85,y+HEAD_RY*0.3);
+      ctx.lineTo(x-HEAD_RX*0.85,y+STEM_H);
+    }
+    ctx.stroke();
+
+    // ── Flags / beams (eighth note = 1 flag) ──
+    if(note.noteType==='eighth'){
+      const sx = stemUp ? x+HEAD_RX*0.85 : x-HEAD_RX*0.85;
+      const sy = stemUp ? y-STEM_H : y+STEM_H;
+      ctx.lineWidth=1.3;
       ctx.beginPath();
-      if (stemUp) {
-        ctx.moveTo(x + HEAD_R * 1.2, y);
-        ctx.lineTo(x + HEAD_R * 1.2, y - STEM_H);
+      if(stemUp){
+        ctx.moveTo(sx,sy);
+        ctx.bezierCurveTo(sx+LS*1.2,sy+LS*0.6, sx+LS*1.0,sy+LS*1.4, sx+LS*0.2,sy+LS*1.8);
       } else {
-        ctx.moveTo(x - HEAD_R * 1.2, y);
-        ctx.lineTo(x - HEAD_R * 1.2, y + STEM_H);
+        ctx.moveTo(sx,sy);
+        ctx.bezierCurveTo(sx-LS*1.2,sy-LS*0.6, sx-LS*1.0,sy-LS*1.4, sx-LS*0.2,sy-LS*1.8);
       }
       ctx.stroke();
     }
+    if(note.noteType==='16th'){
+      const sx = stemUp ? x+HEAD_RX*0.85 : x-HEAD_RX*0.85;
+      const sy = stemUp ? y-STEM_H : y+STEM_H;
+      ctx.lineWidth=1.3;
+      for(let fi=0;fi<2;fi++){
+        const off=fi*LS*0.7;
+        ctx.beginPath();
+        if(stemUp){
+          ctx.moveTo(sx,sy+off);
+          ctx.bezierCurveTo(sx+LS*1.2,sy+off+LS*0.6, sx+LS*1.0,sy+off+LS*1.4, sx+LS*0.2,sy+off+LS*1.8);
+        } else {
+          ctx.moveTo(sx,sy-off);
+          ctx.bezierCurveTo(sx-LS*1.2,sy-off-LS*0.6, sx-LS*1.0,sy-off-LS*1.4, sx-LS*0.2,sy-off-LS*1.8);
+        }
+        ctx.stroke();
+      }
+    }
 
-    // accidental
-    if (note.alter !== 0) {
-      ctx.fillStyle = isPast ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.85)';
-      ctx.font = `${LINE_SPACING * 1.4}px serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      const acc = note.alter > 0 ? '♯' : '♭';
-      ctx.fillText(acc, x - HEAD_R * 2.4, y);
+    // ── Accidental ──
+    if(note.alter!==0){
+      ctx.fillStyle=isPast?'rgba(255,255,255,0.18)':'rgba(255,255,255,0.9)';
+      ctx.font=`${LS*1.5}px serif`;
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      ctx.fillText(note.alter>0?'♯':'♭', x-HEAD_RX*2.6, y);
     }
   });
 
-  // ── TREBLE CLEF (fixed left) ──
-  drawTrebleClef(ctx, 14, staffTop, LINE_SPACING);
+  // ── Treble clef ──
+  ctx.fillStyle='rgba(255,255,255,0.75)';
+  ctx.font=`${LS*7}px serif`;
+  ctx.textAlign='left';
+  ctx.textBaseline='alphabetic';
+  ctx.fillText('𝄞', 6, staffTop+LS*5.1);
 
-  // BPM display
-  document.getElementById('hud-bpm-val').textContent = getBPM();
-
-  raf = requestAnimationFrame(draw);
+  requestAnimationFrame(draw);
 }
 
-function drawLedgerLines(x, y, staffTop, staffBottom) {
-  const tol = LINE_SPACING * 0.1;
-  // above staff
-  let ly = staffTop - LINE_SPACING;
-  while (ly >= y - tol) {
-    if (Math.abs(ly - y) < LINE_SPACING * 0.6) {
-      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(x - HEAD_R * 2, ly);
-      ctx.lineTo(x + HEAD_R * 2, ly);
-      ctx.stroke();
-    }
-    ly -= LINE_SPACING;
-  }
-  // below staff
-  ly = staffBottom + LINE_SPACING;
-  while (ly <= y + tol) {
-    if (Math.abs(ly - y) < LINE_SPACING * 0.6) {
-      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(x - HEAD_R * 2, ly);
-      ctx.lineTo(x + HEAD_R * 2, ly);
-      ctx.stroke();
-    }
-    ly += LINE_SPACING;
-  }
+// ── Controls ──
+function togglePlay(){
+  playing=!playing; lastTs=null;
+  document.getElementById('play-btn').textContent=playing?'⏸ PAUSE':'▶ PLAY';
+}
+function resetScroll(){
+  scrollX=0;playing=false;lastTs=null;
+  document.getElementById('play-btn').textContent='▶ PLAY';
+}
+function toggleFS(){
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();
+  else document.exitFullscreen&&document.exitFullscreen();
 }
 
-// Simple treble clef drawn with canvas paths
-function drawTrebleClef(ctx, x, staffTop, ls) {
-  ctx.save();
-  ctx.strokeStyle = 'rgba(255,255,255,0.7)';
-  ctx.fillStyle = 'rgba(255,255,255,0.7)';
-  ctx.lineWidth = 1.8;
-  ctx.font = `${ls * 6.5}px serif`;
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'alphabetic';
-  // Unicode treble clef glyph — renders well in serif
-  ctx.fillText('𝄞', x, staffTop + ls * 4.2);
-  ctx.restore();
-}
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault();togglePlay();}
+  if(e.code==='KeyR') resetScroll();
+  if(e.code==='KeyF') toggleFS();
+});
 
-// ═══════════════════════════════════════════════
-// CONTROLS
-// ═══════════════════════════════════════════════
+// ── Load embedded MXL on startup ──
+async function loadEmbeddedMXL(){
+  // Dynamically load JSZip from CDN
+  await new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    s.onload=res; s.onerror=rej;
+    document.head.appendChild(s);
+  });
 
-function togglePlay() {
-  playing = !playing;
-  lastTs = null;
-  document.getElementById('play-btn').textContent = playing ? '⏸ PAUSE' : '▶ PLAY';
-}
+  const bin=atob(MXL_B64);
+  const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
 
-function resetScroll() {
-  scrollX = 0;
-  playing = false;
-  lastTs = null;
-  document.getElementById('play-btn').textContent = '▶ PLAY';
-}
+  const zip=await JSZip.loadAsync(bytes);
 
-function reloadFile() {
-  scoreData = null;
-  scrollX = 0;
-  playing = false;
-  lastTs = null;
-  document.getElementById('play-btn').textContent = '▶ PLAY';
-  document.getElementById('score-view').classList.remove('visible');
-  document.getElementById('drop-zone').classList.remove('hidden');
-}
+  // find .xml file (not META-INF)
+  let xmlFile=null;
+  zip.forEach((path,file)=>{
+    if(path.endsWith('.xml')&&!path.startsWith('META')) xmlFile=file;
+  });
+  if(!xmlFile) throw new Error('No XML in MXL');
 
-function toggleFS() {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
-  } else {
-    document.exitFullscreen && document.exitFullscreen();
+  const xmlStr=await xmlFile.async('string');
+  scoreData=parseMusicXML(xmlStr);
+  console.log('Loaded score:', scoreData.notes.length, 'notes,', scoreData.measureStartTicks.length, 'measures');
+
+  // Auto-start if launched from settings
+  if(localStorage.getItem('score_autostart')==='1'){
+    localStorage.removeItem('score_autostart');
+    playing=true;
+    document.getElementById('play-btn').textContent='⏸ PAUSE';
   }
 }
 
-function showError(msg) {
-  const el = document.getElementById('err');
-  el.textContent = msg;
-  el.style.display = 'block';
-  setTimeout(() => el.style.display = 'none', 4000);
-}
-
-// ═══════════════════════════════════════════════
-// FILE HANDLING
-// ═══════════════════════════════════════════════
-
-async function loadFile(file) {
-  try {
-    let text;
-    if (file.name.endsWith('.mxl')) {
-      // .mxl is a ZIP — use JSZip to extract
-      showError('MXL (compressed) format: please export as uncompressed .xml from your notation app.');
-      return;
-    } else {
-      text = await file.text();
-    }
-    const data = parseMusicXML(text);
-    if (data.notes.length === 0) throw new Error('No notes found');
-    scoreData = data;
-    scrollX = 0;
-    playing = false;
-    document.getElementById('drop-zone').classList.add('hidden');
-    document.getElementById('score-view').classList.add('visible');
-    resize();
-  } catch (e) {
-    showError('Parse error: ' + e.message);
-    console.error(e);
-  }
-}
-
-// drag and drop
-const dropZone = document.getElementById('drop-zone');
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
+// Also support drag-drop of new MXL files
+document.addEventListener('dragover',e=>e.preventDefault());
+document.addEventListener('drop',async e=>{
   e.preventDefault();
-  dropZone.classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file) loadFile(file);
+  const file=e.dataTransfer.files[0];
+  if(!file) return;
+  const buf=await file.arrayBuffer();
+  const bytes=new Uint8Array(buf);
+  let xmlStr;
+  if(file.name.endsWith('.mxl')){
+    await new Promise((res,rej)=>{
+      if(window.JSZip){res();return;}
+      const s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+      s.onload=res;s.onerror=rej;document.head.appendChild(s);
+    });
+    const zip=await JSZip.loadAsync(bytes);
+    let xmlFile=null;
+    zip.forEach((path,file)=>{if(path.endsWith('.xml')&&!path.startsWith('META')) xmlFile=file;});
+    xmlStr=await xmlFile.async('string');
+  } else {
+    xmlStr=new TextDecoder().decode(bytes);
+  }
+  scoreData=parseMusicXML(xmlStr);
+  resetScroll();
 });
 
-document.getElementById('file-input').addEventListener('change', e => {
-  const file = e.target.files[0];
-  if (file) loadFile(file);
-});
-
-// keyboard
-document.addEventListener('keydown', e => {
-  if (e.code === 'Space') { e.preventDefault(); if (scoreData) togglePlay(); }
-  if (e.code === 'KeyR') resetScroll();
-  if (e.code === 'KeyF') toggleFS();
-});
-
-// start render loop
-resize();
 requestAnimationFrame(draw);
+loadEmbeddedMXL();
 </script>
 </body>
 </html>
