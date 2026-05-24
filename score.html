@@ -27,17 +27,13 @@ canvas{display:block;width:100%;height:100%;position:fixed;inset:0}
 .sp{flex:1}
 #loading{
   position:fixed;inset:0;background:#000;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:0.75rem;
+  align-items:center;justify-content:center;gap:0.5rem;
   color:rgba(255,255,255,0.3);font-size:0.75rem;letter-spacing:0.2em;z-index:20
 }
-#drop-hint{font-size:0.6rem;color:rgba(255,255,255,0.15);letter-spacing:0.15em}
 </style>
 </head>
 <body>
-<div id="loading">
-  <div>LOADING SCORE...</div>
-  <div id="drop-hint">OR DRAG A NEW .MXL / .XML FILE ONTO THIS WINDOW</div>
-</div>
+<div id="loading"><div>LOADING SCORE...</div><div style="font-size:0.6rem;color:rgba(255,255,255,0.12);margin-top:0.25rem">DRAG A NEW .MXL OR .XML TO REPLACE</div></div>
 <canvas id="c"></canvas>
 <div id="hud">
   <div class="hb">BPM <span id="hbpm">72</span></div>
@@ -52,32 +48,33 @@ canvas{display:block;width:100%;height:100%;position:fixed;inset:0}
 <script>
 const MXL_B64 = "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";
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════
 // PARSER
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════
 function parseMXML(xmlStr) {
   const doc = new DOMParser().parseFromString(xmlStr, 'application/xml');
   const part = doc.querySelector('part');
-  if (!part) throw new Error('No <part> found');
+  if (!part) throw new Error('No <part>');
 
   let divisions = 1;
-  let timeSig = { beats:4, beatType:4 };
+  let timeSig = {beats:4, beatType:4};
   let globalTick = 0;
 
-  const notes    = [];
-  const measures = [];
-  const tuplets  = [];
-  const beamGroups = []; // [{noteIndices}]
+  const notes    = [];  // note objects
+  const measures = [];  // {startTick, endTick, timeSig}
+  const tuplets  = [];  // {label, noteIndices[]}
+  const beams    = [];  // {noteIndices[], level} — each begin→end segment is one beam
 
-  const activeTuplets = {}; // num → {actual,normal,noteIndices,showNum}
-  let activeBeam = null;    // {noteIndices}
+  const activeTuplets = {}; // bracket# → {actual,normal,noteIndices,showNum}
+  // active beams per beam-number: beam-number → noteIndices[]
+  const activeBeams = {};
 
   part.querySelectorAll('measure').forEach((m, mi) => {
     const divEl = m.querySelector('divisions');
     if (divEl) divisions = parseInt(divEl.textContent)||1;
     const bEl  = m.querySelector('beats');
     const btEl = m.querySelector('beat-type');
-    if (bEl)  timeSig = { beats: parseInt(bEl.textContent)||4, beatType: parseInt(btEl.textContent)||4 };
+    if (bEl)  timeSig = {beats:parseInt(bEl.textContent)||4, beatType:parseInt(btEl.textContent)||4};
 
     const startTick = globalTick;
     let mTick = globalTick;
@@ -90,26 +87,17 @@ function parseMXML(xmlStr) {
       const stemUp  = (n.querySelector('stem')?.textContent||'up') !== 'down';
       const noteType= n.querySelector('type')?.textContent||'quarter';
 
-      // tuplet tracking
+      // tuplet bookkeeping
       const tm = n.querySelector('time-modification');
-      let actual=1, normal=1;
       if (tm) {
-        actual = parseInt(tm.querySelector('actual-notes')?.textContent||'1');
-        normal = parseInt(tm.querySelector('normal-notes')?.textContent||'1');
+        const actual = parseInt(tm.querySelector('actual-notes')?.textContent||'1');
+        const normal = parseInt(tm.querySelector('normal-notes')?.textContent||'1');
         n.querySelectorAll('tuplet').forEach(tel => {
           const ttype = tel.getAttribute('type');
           const tnum  = tel.getAttribute('number')||'1';
-          if (ttype==='start') {
-            activeTuplets[tnum] = { actual, normal, noteIndices:[], showNum: tel.getAttribute('show-number') };
-          }
+          if (ttype==='start') activeTuplets[tnum]={actual,normal,noteIndices:[],showNum:tel.getAttribute('show-number')};
         });
       }
-
-      // beam tracking
-      const beamEls = [...n.querySelectorAll('beam')];
-      const beamBegin = beamEls.some(b => b.getAttribute('number')==='1' && b.textContent==='begin');
-      const beamContinue = beamEls.some(b => b.getAttribute('number')==='1' && (b.textContent==='continue'||b.textContent==='end'));
-      const beamEnd = beamEls.some(b => b.getAttribute('number')==='1' && b.textContent==='end');
 
       const noteTick = isChord
         ? (notes.length>0 ? notes[notes.length-1].tick : mTick)
@@ -122,339 +110,368 @@ function parseMXML(xmlStr) {
           const step  = p.querySelector('step')?.textContent||'C';
           const oct   = parseInt(p.querySelector('octave')?.textContent||'4');
           const alter = parseFloat(p.querySelector('alter')?.textContent||'0');
-          const midi  = stepMidi(step, oct, alter);
           noteIdx = notes.length;
-          notes.push({ tick:noteTick, dur, midi, alter, stemUp, noteType,
-                       hasTuplet:!!tm, measureIdx:mi, beamGroupIdx:-1 });
+          notes.push({
+            tick:noteTick, dur, midi:stepMidi(step,oct,alter),
+            alter, stemUp, noteType, measureIdx:mi,
+            // beam group index assigned later: -1 = no beam
+            beamGroup: null
+          });
         }
       }
 
-      // register in tuplets
-      if (tm && noteIdx>=0) Object.values(activeTuplets).forEach(tg => tg.noteIndices.push(noteIdx));
+      // register in active tuplets
+      if (tm && noteIdx>=0) Object.values(activeTuplets).forEach(tg=>tg.noteIndices.push(noteIdx));
 
-      // beam groups
-      if (noteIdx >= 0) {
-        if (beamBegin) {
-          activeBeam = { noteIndices:[noteIdx] };
-        } else if (beamContinue && activeBeam) {
-          activeBeam.noteIndices.push(noteIdx);
-        }
-        if (beamEnd && activeBeam) {
-          activeBeam.noteIndices.push(noteIdx);
-          // assign group index to all notes
-          const gIdx = beamGroups.length;
-          activeBeam.noteIndices.forEach(ni => { notes[ni].beamGroupIdx = gIdx; });
-          beamGroups.push({ noteIndices: activeBeam.noteIndices });
-          activeBeam = null;
-        }
-      }
+      // process beam elements — each beam number tracks independently
+      // beam number 1 = primary beam, 2 = secondary (16th), 3 = tertiary (32nd)
+      n.querySelectorAll('beam').forEach(bel => {
+        const bnum = bel.getAttribute('number')||'1';
+        const bval = bel.textContent; // begin | continue | end | forward hook | backward hook
 
-      // close tuplets
+        if (bval==='begin') {
+          activeBeams[bnum] = {noteIndices: noteIdx>=0?[noteIdx]:[], level:parseInt(bnum)};
+        } else if ((bval==='continue'||bval==='forward hook'||bval==='backward hook') && activeBeams[bnum]) {
+          if (noteIdx>=0) activeBeams[bnum].noteIndices.push(noteIdx);
+        } else if (bval==='end' && activeBeams[bnum]) {
+          if (noteIdx>=0) activeBeams[bnum].noteIndices.push(noteIdx);
+          const bg = activeBeams[bnum];
+          if (bg.noteIndices.length>=2) {
+            const beamIdx = beams.length;
+            beams.push({noteIndices:[...bg.noteIndices], level:bg.level});
+            // mark notes with their primary beam group (level 1 only)
+            if (bg.level===1) {
+              bg.noteIndices.forEach(ni => { notes[ni].beamGroup = beamIdx; });
+            }
+          }
+          delete activeBeams[bnum];
+        }
+      });
+
+      // close tuplets on stop
       if (tm) {
         n.querySelectorAll('tuplet').forEach(tel => {
-          const ttype = tel.getAttribute('type');
-          const tnum  = tel.getAttribute('number')||'1';
-          if (ttype==='stop' && activeTuplets[tnum]) {
-            const tg = activeTuplets[tnum];
+          const ttype=tel.getAttribute('type');
+          const tnum=tel.getAttribute('number')||'1';
+          if (ttype==='stop'&&activeTuplets[tnum]) {
+            const tg=activeTuplets[tnum];
             if (tg.noteIndices.length>0) {
-              const label = tg.showNum==='none' ? '' : `${tg.actual}:${tg.normal}`;
-              tuplets.push({ label, noteIndices: tg.noteIndices });
+              const label=tg.showNum==='none'?'':`${tg.actual}:${tg.normal}`;
+              tuplets.push({label, noteIndices:tg.noteIndices});
             }
             delete activeTuplets[tnum];
           }
         });
       }
 
-      if (!isChord && !isGrace) mTick += dur;
+      if (!isChord&&!isGrace) mTick+=dur;
     });
 
-    const measDur = Math.round(timeSig.beats * divisions * 4 / timeSig.beatType);
-    globalTick = startTick + measDur;
-    measures.push({ startTick, endTick:globalTick, timeSig:{...timeSig} });
+    const measDur = Math.round(timeSig.beats*divisions*4/timeSig.beatType);
+    globalTick = startTick+measDur;
+    measures.push({startTick, endTick:globalTick, timeSig:{...timeSig}});
   });
 
-  return { notes, measures, tuplets, beamGroups, divisions, totalTicks:globalTick };
+  return {notes, measures, tuplets, beams, divisions, totalTicks:globalTick};
 }
 
-function stepMidi(step, oct, alter) {
-  return (oct+1)*12 + {C:0,D:2,E:4,F:5,G:7,A:9,B:11}[step] + Math.round(alter);
+function stepMidi(step,oct,alter){
+  return (oct+1)*12+{C:0,D:2,E:4,F:5,G:7,A:9,B:11}[step]+Math.round(alter);
 }
 
-const DIAT = [0,0,1,1,2,3,3,4,4,5,5,6];
-function midiToY(midi, midLineY, LS) {
-  const refDiat = 4*7+6; // B4
-  const oct  = Math.floor(midi/12)-1;
-  const diat = oct*7 + DIAT[midi%12];
-  return midLineY + (refDiat - diat)*(LS/2);
+const DIAT=[0,0,1,1,2,3,3,4,4,5,5,6];
+function midiToY(midi,midLineY,LS){
+  const refDiat=4*7+6; // B4
+  const oct=Math.floor(midi/12)-1;
+  const diat=oct*7+DIAT[midi%12];
+  return midLineY+(refDiat-diat)*(LS/2);
 }
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════
 // RENDERER
-// ═══════════════════════════════════════════
-const canvas = document.getElementById('c');
-const ctx    = canvas.getContext('2d');
+// ═══════════════════════════════════════
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
 
 const LS    = 18;
 const HR_X  = LS*0.52;
 const HR_Y  = LS*0.37;
 const STEM  = LS*3.5;
-const BEAM_H = LS*0.55;  // beam bar thickness
-const BEAM_GAP = LS*0.7; // gap between beam bars (16th etc)
-const PX_Q  = 110;
+const BW    = LS*0.52;  // beam bar thickness
+const BGAP  = LS*0.72;  // gap between beam levels
+const PX_Q  = 110;      // px per quarter note
 
-let data    = null;
-let scrollX = 0;
-let playing = false;
-let lastTs  = null;
+let data=null, scrollX=0, playing=false, lastTs=null;
 
-function getBPM()   { return Math.min(220,Math.max(20,parseInt(localStorage.getItem('pulse_bpm')||'72'))); }
-function getSpeed() { return (getBPM()/60)*PX_Q; }
+function getBPM(){return Math.min(220,Math.max(20,parseInt(localStorage.getItem('pulse_bpm')||'72')));}
+function getSpeed(){return (getBPM()/60)*PX_Q;}
 
-function resize() {
-  canvas.width  = canvas.offsetWidth*devicePixelRatio;
-  canvas.height = canvas.offsetHeight*devicePixelRatio;
+function resize(){
+  canvas.width=canvas.offsetWidth*devicePixelRatio;
+  canvas.height=canvas.offsetHeight*devicePixelRatio;
 }
-window.addEventListener('resize', resize);
+window.addEventListener('resize',resize);
 resize();
 
-// Compute a beam group's stem endpoint (all stems normalized to same height)
-function beamStemTip(group, notes, midLineY, stemUp) {
-  // Find the note furthest from beam (needs longest stem)
-  let extremeY = stemUp ? Infinity : -Infinity;
-  group.noteIndices.forEach(ni => {
-    const n = notes[ni];
-    if (!n) return;
-    const y = midiToY(n.midi, midLineY, LS);
-    if (stemUp && y < extremeY) extremeY = y;
-    if (!stemUp && y > extremeY) extremeY = y;
-  });
-  // Beam y = tip of longest stem
-  return stemUp ? extremeY - STEM : extremeY + STEM;
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);
+  ctx.closePath();
 }
 
-function draw(ts) {
-  if (lastTs!==null && playing) {
-    const dt = Math.min(ts-lastTs, 50);
-    scrollX += getSpeed()*(dt/1000);
-  }
-  lastTs = ts;
+// Compute beam Y: normalize all stems in a group to the same height
+// = tip of the note that needs the longest stem (furthest from beam side)
+function beamY(group,notes,midLineY){
+  const stemUp=notes[group.noteIndices[0]]?.stemUp??true;
+  let extreme = stemUp ? Infinity : -Infinity;
+  group.noteIndices.forEach(ni=>{
+    const n=notes[ni]; if(!n) return;
+    const y=midiToY(n.midi,midLineY,LS);
+    const tipY=stemUp ? y-STEM : y+STEM;
+    if(stemUp&&tipY<extreme) extreme=tipY;
+    if(!stemUp&&tipY>extreme) extreme=tipY;
+  });
+  return extreme;
+}
 
-  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+function draw(ts){
+  if(lastTs!==null&&playing){
+    const dt=Math.min(ts-lastTs,50);
+    scrollX+=getSpeed()*(dt/1000);
+  }
+  lastTs=ts;
+
+  const W=canvas.offsetWidth,H=canvas.offsetHeight;
   ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
-  ctx.fillStyle = '#000';
+  ctx.fillStyle='#000';
   ctx.fillRect(0,0,W,H);
 
-  if (!data) { requestAnimationFrame(draw); return; }
+  if(!data){requestAnimationFrame(draw);return;}
 
-  const {notes, measures, tuplets, beamGroups, divisions} = data;
-  const pxPerTick = PX_Q/divisions;
-  const cursorX   = Math.round(W*0.18);
-  const staffTop  = Math.round(H*0.5 - LS*3);
-  const staffBot  = staffTop + LS*4;
-  const midLineY  = staffTop + LS*2; // B4
+  const {notes,measures,tuplets,beams,divisions}=data;
+  const pxPerTick=PX_Q/divisions;
+  const cursorX=Math.round(W*0.18);
+
+  // Staff geometry
+  const staffTop=Math.round(H*0.5-LS*3);
+  const staffBot=staffTop+LS*4;
+  const midLineY=staffTop+LS*2; // B4 sits on this line
 
   // ── Staff lines ──
-  ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-  ctx.lineWidth = 1;
-  for (let i=0;i<5;i++) {
-    const y = staffTop+i*LS;
-    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,0.6)';
+  ctx.lineWidth=1;
+  for(let i=0;i<5;i++){
+    const y=staffTop+i*LS;
+    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
   }
 
   // ── Cursor ──
-  ctx.strokeStyle = 'rgba(255,30,60,0.4)';
-  ctx.lineWidth = 1.5;
+  ctx.strokeStyle='rgba(255,30,60,0.4)';
+  ctx.lineWidth=1.5;
   ctx.setLineDash([3,6]);
-  ctx.beginPath(); ctx.moveTo(cursorX,staffTop-LS*5); ctx.lineTo(cursorX,staffBot+LS*2); ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cursorX,staffTop-LS*5);ctx.lineTo(cursorX,staffBot+LS*2);ctx.stroke();
   ctx.setLineDash([]);
 
   // ── Barlines + time signatures ──
-  const curTick = scrollX/pxPerTick;
-  let currentBar = 1;
-  let prevTS = null;
+  const curTick=scrollX/pxPerTick;
+  let currentBar=1, prevTS=null;
 
-  measures.forEach((ms,i) => {
-    const x = Math.round(cursorX + ms.startTick*pxPerTick - scrollX);
-    if (ms.startTick<=curTick) currentBar=i+1;
-    if (x<-4||x>W+4) { prevTS=ms.timeSig; return; }
+  measures.forEach((ms,i)=>{
+    const x=Math.round(cursorX+ms.startTick*pxPerTick-scrollX);
+    if(ms.startTick<=curTick) currentBar=i+1;
+    if(x<-4||x>W+4){prevTS=ms.timeSig;return;}
 
-    // barline — full height, bright
-    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(x,staffTop); ctx.lineTo(x,staffBot); ctx.stroke();
+    ctx.strokeStyle='rgba(255,255,255,0.5)';
+    ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(x,staffTop);ctx.lineTo(x,staffBot);ctx.stroke();
 
-    // time sig — stacked, only on change, rendered on a clean dark pill above staff
-    const ts = ms.timeSig;
-    const changed = !prevTS || ts.beats!==prevTS.beats || ts.beatType!==prevTS.beatType;
-    if (changed) {
-      const tsSize = LS*1.3;
-      const tsX = x + 8;
-      const tsY = staffTop - LS*0.6;
-
-      // dark backdrop pill so numbers never clash with notes
-      const pillW = tsSize*0.8 + 10;
-      const pillH = tsSize*2 + 6;
-      ctx.fillStyle = 'rgba(0,0,0,0.75)';
-      roundRect(ctx, tsX - 5, tsY - tsSize*2 - 3, pillW, pillH, 4);
+    const ts=ms.timeSig;
+    const changed=!prevTS||ts.beats!==prevTS.beats||ts.beatType!==prevTS.beatType;
+    if(changed){
+      const sz=LS*1.2;
+      const cx=x+sz*0.5+6;
+      // dark pill behind numbers
+      const pw=sz+12, ph=sz*2+8;
+      const px=cx-pw/2, py=staffTop-ph-4;
+      ctx.fillStyle='rgba(0,0,0,0.8)';
+      roundRect(ctx,px,py,pw,ph,4);
       ctx.fill();
-
       // numbers
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
-      ctx.font = `bold ${tsSize}px serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      const cx = tsX + pillW/2 - 5;
-      ctx.fillText(ts.beats,    cx, tsY - tsSize*1.1);
-      ctx.fillText(ts.beatType, cx, tsY - tsSize*0.1);
+      ctx.fillStyle='rgba(255,255,255,0.92)';
+      ctx.font=`bold ${sz}px serif`;
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      ctx.fillText(ts.beats,    cx, staffTop-sz*1.1-4);
+      ctx.fillText(ts.beatType, cx, staffTop-sz*0.1-4);
     }
-    prevTS = ts;
+    prevTS=ts;
   });
 
-  document.getElementById('hbar').textContent = currentBar;
-  document.getElementById('htot').textContent = measures.length;
-  document.getElementById('hbpm').textContent = getBPM();
+  document.getElementById('hbar').textContent=currentBar;
+  document.getElementById('htot').textContent=measures.length;
+  document.getElementById('hbpm').textContent=getBPM();
 
   // ── Tuplet brackets ──
-  tuplets.forEach(tg => {
-    const {label, noteIndices} = tg;
-    if (noteIndices.length<2) return;
-    const first = notes[noteIndices[0]];
-    const last  = notes[noteIndices[noteIndices.length-1]];
-    if (!first||!last) return;
+  tuplets.forEach(tg=>{
+    const {label,noteIndices}=tg;
+    if(noteIndices.length<2) return;
+    const first=notes[noteIndices[0]];
+    const last =notes[noteIndices[noteIndices.length-1]];
+    if(!first||!last) return;
 
-    const x1 = cursorX + first.tick*pxPerTick - scrollX;
-    const x2 = cursorX + (last.tick+last.dur)*pxPerTick - scrollX;
-    if (x2<0||x1>W) return;
+    const x1=cursorX+first.tick*pxPerTick-scrollX;
+    const x2=cursorX+(last.tick+last.dur)*pxPerTick-scrollX;
+    if(x2<0||x1>W) return;
 
-    const stemUp = first.stemUp;
-    let bracketY = stemUp ? staffTop - LS*1.6 : staffBot + LS*1.6;
-    // push above/below the highest/lowest stem tip in group
-    noteIndices.forEach(ni => {
-      const n = notes[ni]; if(!n) return;
-      const ny = midiToY(n.midi, midLineY, LS);
-      const tip = stemUp ? ny-STEM : ny+STEM;
-      if (stemUp && tip < bracketY) bracketY = tip;
-      if (!stemUp && tip > bracketY) bracketY = tip;
+    const stemUp=first.stemUp;
+    // find extreme stem tip across all notes in tuplet
+    let bY=stemUp?staffTop-LS*1.5:staffBot+LS*1.5;
+    noteIndices.forEach(ni=>{
+      const n=notes[ni];if(!n)return;
+      const ny=midiToY(n.midi,midLineY,LS);
+      const tip=stemUp?ny-STEM:ny+STEM;
+      if(stemUp&&tip<bY) bY=tip;
+      if(!stemUp&&tip>bY) bY=tip;
     });
-    bracketY += stemUp ? -10 : 10;
+    bY+=stemUp?-12:12;
 
-    const midX = (x1+x2)/2;
-    const legH = 7;
+    const midX=(x1+x2)/2;
+    const legH=7;
+    ctx.strokeStyle='rgba(255,255,255,0.6)';
+    ctx.lineWidth=1;
 
-    ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-    ctx.lineWidth = 1;
+    // legs
+    ctx.beginPath();ctx.moveTo(x1,bY+(stemUp?legH:-legH));ctx.lineTo(x1,bY);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x2,bY+(stemUp?legH:-legH));ctx.lineTo(x2,bY);ctx.stroke();
 
-    if (stemUp) {
-      ctx.beginPath(); ctx.moveTo(x1,bracketY+legH); ctx.lineTo(x1,bracketY); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(x2,bracketY+legH); ctx.lineTo(x2,bracketY); ctx.stroke();
+    if(label){
+      ctx.font='11px Courier New';
+      const tw=ctx.measureText(label).width+8;
+      ctx.beginPath();ctx.moveTo(x1,bY);ctx.lineTo(midX-tw/2,bY);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(midX+tw/2,bY);ctx.lineTo(x2,bY);ctx.stroke();
+      ctx.fillStyle='rgba(255,255,255,0.7)';
+      ctx.textAlign='center';
+      ctx.textBaseline=stemUp?'bottom':'top';
+      ctx.fillText(label,midX,bY+(stemUp?-2:2));
     } else {
-      ctx.beginPath(); ctx.moveTo(x1,bracketY-legH); ctx.lineTo(x1,bracketY); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(x2,bracketY-legH); ctx.lineTo(x2,bracketY); ctx.stroke();
-    }
-
-    if (label) {
-      ctx.font = '11px Courier New';
-      const tw = ctx.measureText(label).width + 8;
-      ctx.beginPath(); ctx.moveTo(x1,bracketY); ctx.lineTo(midX-tw/2,bracketY); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(midX+tw/2,bracketY); ctx.lineTo(x2,bracketY); ctx.stroke();
-      ctx.fillStyle = 'rgba(255,255,255,0.7)';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = stemUp ? 'bottom' : 'top';
-      ctx.fillText(label, midX, bracketY + (stemUp ? -1 : 1));
-    } else {
-      ctx.beginPath(); ctx.moveTo(x1,bracketY); ctx.lineTo(x2,bracketY); ctx.stroke();
+      ctx.beginPath();ctx.moveTo(x1,bY);ctx.lineTo(x2,bY);ctx.stroke();
     }
   });
 
-  // ── Beam groups ──
-  beamGroups.forEach(group => {
-    if (group.noteIndices.length < 2) return;
-    const stemUp = notes[group.noteIndices[0]]?.stemUp ?? true;
-    const beamY  = beamStemTip(group, notes, midLineY, stemUp);
+  // ── Beams — draw each beam segment separately ──
+  // Group beams by their level-1 group first to compute shared stem tip
+  // level-1 beams define the stem height; level-2+ beams are offset from there
 
-    // check any note in range
-    const xs = group.noteIndices.map(ni => {
-      const n = notes[ni];
-      return n ? cursorX + n.tick*pxPerTick - scrollX : null;
-    }).filter(x => x!==null);
-    if (xs.every(x => x<-80||x>W+80)) return;
-
-    // draw primary beam bar across all notes in group
-    const x1 = cursorX + notes[group.noteIndices[0]].tick*pxPerTick - scrollX;
-    const lastNote = notes[group.noteIndices[group.noteIndices.length-1]];
-    const x2 = cursorX + lastNote.tick*pxPerTick - scrollX;
-
-    ctx.fillStyle = '#fff';
-    const by = stemUp ? beamY : beamY - BEAM_H;
-    ctx.fillRect(x1, by, x2-x1, BEAM_H);
-
-    // secondary beam bars for 16th notes (each pair)
-    group.noteIndices.forEach((ni, gi) => {
-      const n = notes[ni];
-      if (!n || n.noteType !== '16th') return;
-      const nx = cursorX + n.tick*pxPerTick - scrollX;
-      const nextNi = group.noteIndices[gi+1];
-      const nextN  = nextNi !== undefined ? notes[nextNi] : null;
-      const nx2    = nextN ? cursorX + nextN.tick*pxPerTick - scrollX : nx + PX_Q*pxPerTick*0.5;
-      const by2    = stemUp ? beamY + BEAM_GAP : beamY - BEAM_H - BEAM_GAP;
-      ctx.fillRect(nx, by2, nx2-nx, BEAM_H);
-    });
-
-    // draw stems — all to same beam Y
-    group.noteIndices.forEach(ni => {
-      const n = notes[ni]; if(!n) return;
-      const nx = cursorX + n.tick*pxPerTick - scrollX;
-      if (nx < -80 || nx > W+80) return;
-      const ny = midiToY(n.midi, midLineY, LS);
-      const sx = stemUp ? nx+HR_X*0.85 : nx-HR_X*0.85;
-      const sy0 = stemUp ? ny-HR_Y*0.4 : ny+HR_Y*0.4;
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 1.4;
-      ctx.beginPath(); ctx.moveTo(sx,sy0); ctx.lineTo(sx,beamY); ctx.stroke();
-    });
+  // Build a map: primary beam index → beamY
+  const beamYMap = {};
+  beams.forEach((bg,bi)=>{
+    if(bg.level===1){
+      const valid=bg.noteIndices.filter(ni=>notes[ni]);
+      if(valid.length<2) return;
+      beamYMap[bi]=beamY(bg,notes,midLineY);
+    }
   });
 
-  // ── Notes (heads + accidentals + unbeamed stems/flags) ──
-  notes.forEach(note => {
-    const x = cursorX + note.tick*pxPerTick - scrollX;
-    if (x<-80||x>W+80) return;
+  // For level>1 beams, find their owning level-1 beam by note membership
+  // Build note→primary beam map
+  const noteToPrimaryBeam={};
+  beams.forEach((bg,bi)=>{
+    if(bg.level===1) bg.noteIndices.forEach(ni=>{ noteToPrimaryBeam[ni]=bi; });
+  });
 
-    const y = midiToY(note.midi, midLineY, LS);
+  beams.forEach((bg,bi)=>{
+    if(bg.noteIndices.length<2) return;
+    const first=notes[bg.noteIndices[0]];
+    if(!first) return;
+    const stemUp=first.stemUp;
 
-    // ledger lines above
-    for (let ly=staffTop-LS; ly>=y-1; ly-=LS) {
-      if (Math.abs(ly-y)<2) {
-        ctx.strokeStyle='#fff'; ctx.lineWidth=1.2;
-        ctx.beginPath(); ctx.moveTo(x-HR_X*2,ly); ctx.lineTo(x+HR_X*2,ly); ctx.stroke();
+    // determine beam Y for this level
+    let bY;
+    if(bg.level===1){
+      bY=beamYMap[bi];
+    } else {
+      // find primary beam for this group's first note
+      const primaryIdx=noteToPrimaryBeam[bg.noteIndices[0]];
+      const primaryY=primaryIdx!==undefined?beamYMap[primaryIdx]:null;
+      if(primaryY===null) return;
+      const offset=(bg.level-1)*(BW+BGAP);
+      bY=stemUp?primaryY+offset:primaryY-offset;
+    }
+    if(bY===undefined) return;
+
+    // x coords of first and last note in this beam segment
+    const n0=notes[bg.noteIndices[0]];
+    const nL=notes[bg.noteIndices[bg.noteIndices.length-1]];
+    if(!n0||!nL) return;
+    const x1=cursorX+n0.tick*pxPerTick-scrollX;
+    const x2=cursorX+nL.tick*pxPerTick-scrollX;
+    if(x2<-80||x1>W+80) return;
+
+    // draw filled beam rectangle
+    ctx.fillStyle='#fff';
+    const by=stemUp?bY:bY-BW;
+    ctx.fillRect(x1,by,x2-x1,BW);
+
+    // draw stems for notes in this primary beam group only (once, at level 1)
+    if(bg.level===1){
+      bg.noteIndices.forEach(ni=>{
+        const n=notes[ni];if(!n)return;
+        const nx=cursorX+n.tick*pxPerTick-scrollX;
+        if(nx<-80||nx>W+80) return;
+        const ny=midiToY(n.midi,midLineY,LS);
+        const sx=stemUp?nx+HR_X*0.85:nx-HR_X*0.85;
+        const sy0=stemUp?ny-HR_Y*0.4:ny+HR_Y*0.4;
+        ctx.strokeStyle='#fff';
+        ctx.lineWidth=1.4;
+        ctx.beginPath();ctx.moveTo(sx,sy0);ctx.lineTo(sx,bY);ctx.stroke();
+      });
+    }
+  });
+
+  // ── Note heads, ledger lines, accidentals, unbeamed stems/flags ──
+  notes.forEach(note=>{
+    const x=cursorX+note.tick*pxPerTick-scrollX;
+    if(x<-80||x>W+80) return;
+    const y=midiToY(note.midi,midLineY,LS);
+
+    // ledger lines above staff
+    for(let ly=staffTop-LS;ly>=y-1;ly-=LS){
+      if(Math.abs(ly-y)<2){
+        ctx.strokeStyle='#fff';ctx.lineWidth=1.2;
+        ctx.beginPath();ctx.moveTo(x-HR_X*2.1,ly);ctx.lineTo(x+HR_X*2.1,ly);ctx.stroke();
       }
     }
-    // ledger lines below
-    for (let ly=staffBot+LS; ly<=y+1; ly+=LS) {
-      if (Math.abs(ly-y)<2) {
-        ctx.strokeStyle='#fff'; ctx.lineWidth=1.2;
-        ctx.beginPath(); ctx.moveTo(x-HR_X*2,ly); ctx.lineTo(x+HR_X*2,ly); ctx.stroke();
+    // ledger lines below staff
+    for(let ly=staffBot+LS;ly<=y+1;ly+=LS){
+      if(Math.abs(ly-y)<2){
+        ctx.strokeStyle='#fff';ctx.lineWidth=1.2;
+        ctx.beginPath();ctx.moveTo(x-HR_X*2.1,ly);ctx.lineTo(x+HR_X*2.1,ly);ctx.stroke();
       }
     }
 
-    // note head — always white
-    ctx.fillStyle = '#fff';
+    // note head
+    ctx.fillStyle='#fff';
     ctx.beginPath();
-    ctx.ellipse(x, y, HR_X, HR_Y, -0.15, 0, Math.PI*2);
+    ctx.ellipse(x,y,HR_X,HR_Y,-0.15,0,Math.PI*2);
     ctx.fill();
 
-    // unbeamed stem + flag
-    if (note.beamGroupIdx === -1) {
-      const sx  = note.stemUp ? x+HR_X*0.85 : x-HR_X*0.85;
-      const sy0 = note.stemUp ? y-HR_Y*0.4  : y+HR_Y*0.4;
-      const sy1 = note.stemUp ? y-STEM       : y+STEM;
-      ctx.strokeStyle='#fff'; ctx.lineWidth=1.3;
-      ctx.beginPath(); ctx.moveTo(sx,sy0); ctx.lineTo(sx,sy1); ctx.stroke();
-
-      const flagCount = {'eighth':1,'16th':2,'32nd':3}[note.noteType]||0;
-      for (let fi=0;fi<flagCount;fi++) {
-        const fy = note.stemUp ? sy1+fi*LS*0.9 : sy1-fi*LS*0.9;
+    // unbeamed: draw stem + flags
+    if(note.beamGroup===null){
+      const sx=note.stemUp?x+HR_X*0.85:x-HR_X*0.85;
+      const sy0=note.stemUp?y-HR_Y*0.4:y+HR_Y*0.4;
+      const sy1=note.stemUp?y-STEM:y+STEM;
+      ctx.strokeStyle='#fff';ctx.lineWidth=1.3;
+      ctx.beginPath();ctx.moveTo(sx,sy0);ctx.lineTo(sx,sy1);ctx.stroke();
+      const fc={'eighth':1,'16th':2,'32nd':3}[note.noteType]||0;
+      for(let fi=0;fi<fc;fi++){
+        const fy=note.stemUp?sy1+fi*LS*0.9:sy1-fi*LS*0.9;
+        ctx.lineWidth=1.3;
         ctx.beginPath();
-        if (note.stemUp) {
+        if(note.stemUp){
           ctx.moveTo(sx,fy);
           ctx.bezierCurveTo(sx+LS*1.4,fy+LS*0.5,sx+LS*1.1,fy+LS*1.5,sx+LS*0.15,fy+LS*2.1);
         } else {
@@ -466,48 +483,48 @@ function draw(ts) {
     }
 
     // accidental
-    if (note.alter!==0) {
+    if(note.alter!==0){
       ctx.fillStyle='rgba(255,255,255,0.9)';
       ctx.font=`${LS*1.7}px serif`;
       ctx.textAlign='center';
       ctx.textBaseline='middle';
-      ctx.fillText(note.alter>0?'\u266F':'\u266D', x-HR_X*2.8, y+1);
+      ctx.fillText(note.alter>0?'\u266F':'\u266D',x-HR_X*2.8,y+1);
     }
   });
 
-  // ── Treble clef — violin clef anchored to 2nd line from bottom ──
-  // In treble clef: G sits on 2nd line from bottom = line index 3 from top (0-based)
-  // staffTop + 3*LS = that line. The glyph baseline goes there.
+  // ── Treble clef ──
+  // The treble clef glyph 𝄞: its G-curl wraps around the second line from bottom.
+  // In our staff: second line from bottom = line index 3 from top = staffTop + 3*LS
+  // The glyph baseline in most fonts: the G curl centre sits at roughly 2/7 of glyph height
+  // At font-size F, glyph height ≈ F. The curl centre is about 0.28*F from the bottom of the glyph.
+  // So: baseline y = (staffTop + 3*LS) + 0.28*F
+  // With F = LS*7.5: offset = LS*7.5 * 0.28 ≈ LS*2.1
+  // baseline = staffTop + 3*LS + LS*2.1 = staffTop + LS*5.1
+  // But the glyph also extends below the baseline — the curl tail goes below.
+  // Emperically tuned: baseline = staffTop + LS * 5.1 puts curl on line 3-from-top.
+  const clefSize = LS * 7.5;
   ctx.fillStyle='rgba(255,255,255,0.85)';
-  ctx.font=`${LS*7.5}px serif`;
+  ctx.font=`${clefSize}px serif`;
   ctx.textAlign='left';
   ctx.textBaseline='alphabetic';
-  // anchor: bottom of clef curl = line 1 from bottom = staffTop + 3*LS
-  ctx.fillText('\uD834\uDD1E', 8, staffTop + LS*5.3);
+  // G line = staffTop + 3*LS (2nd from bottom, 0-indexed from top)
+  // empirical: baseline = G_line + clefSize*0.27
+  const Gline = staffTop + 3*LS;
+  ctx.fillText('\uD834\uDD1E', 8, Gline + clefSize*0.27);
 
   requestAnimationFrame(draw);
 }
 
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x+r,y);
-  ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r);
-  ctx.lineTo(x+w,y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
-  ctx.lineTo(x+r,y+h); ctx.arcTo(x,y+h,x,y+h-r,r);
-  ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r);
-  ctx.closePath();
-}
-
 // ── Controls ──
-function togglePlay() {
-  playing=!playing; lastTs=null;
+function togglePlay(){
+  playing=!playing;lastTs=null;
   document.getElementById('pbtn').innerHTML=playing?'&#9646;&#9646; PAUSE':'&#9654; PLAY';
 }
-function reset() {
+function reset(){
   scrollX=0;playing=false;lastTs=null;
   document.getElementById('pbtn').innerHTML='&#9654; PLAY';
 }
-function toggleFS() {
+function toggleFS(){
   if(!document.fullscreenElement) document.documentElement.requestFullscreen?.();
   else document.exitFullscreen?.();
 }
@@ -517,20 +534,20 @@ document.addEventListener('keydown',e=>{
   if(e.code==='KeyF') toggleFS();
 });
 
-// ── Load ──
-async function loadMXL(bytes) {
+// ── Load MXL / XML ──
+async function loadMXL(bytes){
   const zip=await JSZip.loadAsync(bytes);
   let xmlFile=null;
-  zip.forEach((path,f)=>{ if(path.endsWith('.xml')&&!path.startsWith('META')) xmlFile=f; });
+  zip.forEach((path,f)=>{if(path.endsWith('.xml')&&!path.startsWith('META')) xmlFile=f;});
   if(!xmlFile) throw new Error('No XML in archive');
   return parseMXML(await xmlFile.async('string'));
 }
 
-async function init() {
+async function init(){
   await new Promise((res,rej)=>{
     const s=document.createElement('script');
     s.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-    s.onload=res; s.onerror=rej;
+    s.onload=res;s.onerror=rej;
     document.head.appendChild(s);
   });
 
@@ -550,11 +567,11 @@ async function init() {
 document.addEventListener('dragover',e=>e.preventDefault());
 document.addEventListener('drop',async e=>{
   e.preventDefault();
-  const file=e.dataTransfer.files[0]; if(!file) return;
+  const file=e.dataTransfer.files[0];if(!file)return;
   const buf=await file.arrayBuffer();
-  data = file.name.toLowerCase().endsWith('.mxl')
-    ? await loadMXL(new Uint8Array(buf))
-    : parseMXML(new TextDecoder().decode(buf));
+  data=file.name.toLowerCase().endsWith('.mxl')
+    ?await loadMXL(new Uint8Array(buf))
+    :parseMXML(new TextDecoder().decode(buf));
   reset();
   document.getElementById('loading').style.display='none';
 });
