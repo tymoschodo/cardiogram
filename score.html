@@ -1,9 +1,9 @@
-<!DOCTYPE html><!-- v3 -->
+<!DOCTYPE html><!-- v4 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Score v3</title>
+<title>Score v4</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Courier New',monospace}
@@ -403,12 +403,13 @@ function draw(ts){
     }
     if(bY===undefined) return;
 
-    // x coords of first and last note in this beam segment
+    // x coords: use stem x (side of notehead), not center
     const n0=notes[bg.noteIndices[0]];
     const nL=notes[bg.noteIndices[bg.noteIndices.length-1]];
     if(!n0||!nL) return;
-    const x1=cursorX+n0.tick*pxPerTick-scrollX;
-    const x2=cursorX+nL.tick*pxPerTick-scrollX;
+    const stemOff = stemUp ? HR_X*0.85 : -HR_X*0.85;
+    const x1=cursorX+n0.tick*pxPerTick-scrollX+stemOff;
+    const x2=cursorX+nL.tick*pxPerTick-scrollX+stemOff;
     if(x2<-80||x1>W+80) return;
 
     // draw filled beam rectangle
@@ -426,8 +427,10 @@ function draw(ts){
         const sx=stemUp?nx+HR_X*0.85:nx-HR_X*0.85;
         const sy0=stemUp?ny-HR_Y*0.4:ny+HR_Y*0.4;
         ctx.strokeStyle='#fff';
-        ctx.lineWidth=1.4;
-        ctx.beginPath();ctx.moveTo(sx,sy0);ctx.lineTo(sx,bY);ctx.stroke();
+        ctx.lineWidth=1.5;
+        // extend stem slightly into beam bar so no gap
+        const sy1 = stemUp ? bY+BW*0.5 : bY-BW*0.5;
+        ctx.beginPath();ctx.moveTo(sx,sy0);ctx.lineTo(sx,sy1);ctx.stroke();
       });
     }
   });
@@ -502,15 +505,15 @@ function draw(ts){
   // baseline = staffTop + 3*LS + LS*2.1 = staffTop + LS*5.1
   // But the glyph also extends below the baseline — the curl tail goes below.
   // Emperically tuned: baseline = staffTop + LS * 5.1 puts curl on line 3-from-top.
-  // Treble clef: G curl wraps the 2nd line from bottom = line index 3 from top
-  // = staffTop + 3*LS. Baseline of glyph = that line + fontSize*0.52 (empirical for serif)
+  // Treble clef: G4 sits on 2nd line from bottom = staffTop+3*LS
+  // Glyph baseline = G_line + clefSize*0.35 places curl center on that line
   const clefSize = LS * 7.5;
-  const Gline = staffTop + 3*LS;
+  const G4line = staffTop + 3*LS;
   ctx.fillStyle='rgba(255,255,255,0.85)';
   ctx.font=`${clefSize}px serif`;
   ctx.textAlign='left';
   ctx.textBaseline='alphabetic';
-  ctx.fillText('\uD834\uDD1E', 8, Gline + clefSize * 0.52);
+  ctx.fillText('\uD834\uDD1E', 8, G4line + clefSize * 0.35);
 
   requestAnimationFrame(draw);
 }
