@@ -1,9 +1,9 @@
-<!DOCTYPE html><!-- v6 -->
+<!DOCTYPE html><!-- v7 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Score v6</title>
+<title>Score v7</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Courier New',monospace}
@@ -41,6 +41,8 @@ canvas{display:block;width:100%;height:100%;position:fixed;inset:0}
   <button class="btn" onclick="reset()">&#8592; RESET</button>
   <div class="sp"></div>
   <div class="hb">BAR <span id="hbar">1</span> / <span id="htot">?</span></div>
+  <button class="btn" onclick="document.getElementById('fileIn').click()">&#8599; LOAD SCORE</button>
+  <input type="file" id="fileIn" accept=".mxl,.xml,.musicxml" style="display:none"/>
   <a class="btn" href="settings.html">SETTINGS</a>
   <a class="btn" href="index.html">MONITOR</a>
   <button class="btn" onclick="toggleFS()">&#x26F6;</button>
@@ -565,16 +567,25 @@ async function init(){
   }
 }
 
-document.addEventListener('dragover',e=>e.preventDefault());
-document.addEventListener('drop',async e=>{
-  e.preventDefault();
-  const file=e.dataTransfer.files[0];if(!file)return;
+async function handleFile(file){
+  if(!file) return;
   const buf=await file.arrayBuffer();
   data=file.name.toLowerCase().endsWith('.mxl')
     ?await loadMXL(new Uint8Array(buf))
     :parseMXML(new TextDecoder().decode(buf));
   reset();
   document.getElementById('loading').style.display='none';
+}
+
+document.getElementById('fileIn').addEventListener('change',e=>{
+  handleFile(e.target.files[0]);
+  e.target.value=''; // reset so same file can be reloaded
+});
+
+document.addEventListener('dragover',e=>e.preventDefault());
+document.addEventListener('drop',async e=>{
+  e.preventDefault();
+  handleFile(e.dataTransfer.files[0]);
 });
 
 requestAnimationFrame(draw);
