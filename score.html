@@ -1,9 +1,9 @@
-<!DOCTYPE html><!-- v4 -->
+<!DOCTYPE html><!-- v5 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Score v4</title>
+<title>Score v5</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Courier New',monospace}
@@ -441,19 +441,15 @@ function draw(ts){
     if(x<-80||x>W+80) return;
     const y=midiToY(note.midi,midLineY,LS);
 
-    // ledger lines above staff
-    for(let ly=staffTop-LS;ly>=y-1;ly-=LS){
-      if(Math.abs(ly-y)<2){
-        ctx.strokeStyle='#fff';ctx.lineWidth=1.2;
-        ctx.beginPath();ctx.moveTo(x-HR_X*2.1,ly);ctx.lineTo(x+HR_X*2.1,ly);ctx.stroke();
-      }
+    // ledger lines above staff — draw every line between staffTop and note
+    for(let ly=staffTop-LS; ly>=y-LS*0.6; ly-=LS){
+      ctx.strokeStyle='#fff'; ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.moveTo(x-HR_X*2.1,ly); ctx.lineTo(x+HR_X*2.1,ly); ctx.stroke();
     }
-    // ledger lines below staff
-    for(let ly=staffBot+LS;ly<=y+1;ly+=LS){
-      if(Math.abs(ly-y)<2){
-        ctx.strokeStyle='#fff';ctx.lineWidth=1.2;
-        ctx.beginPath();ctx.moveTo(x-HR_X*2.1,ly);ctx.lineTo(x+HR_X*2.1,ly);ctx.stroke();
-      }
+    // ledger lines below staff — draw every line between staffBot and note
+    for(let ly=staffBot+LS; ly<=y+LS*0.6; ly+=LS){
+      ctx.strokeStyle='#fff'; ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.moveTo(x-HR_X*2.1,ly); ctx.lineTo(x+HR_X*2.1,ly); ctx.stroke();
     }
 
     // note head
@@ -505,15 +501,17 @@ function draw(ts){
   // baseline = staffTop + 3*LS + LS*2.1 = staffTop + LS*5.1
   // But the glyph also extends below the baseline — the curl tail goes below.
   // Emperically tuned: baseline = staffTop + LS * 5.1 puts curl on line 3-from-top.
-  // Treble clef: G4 sits on 2nd line from bottom = staffTop+3*LS
-  // Glyph baseline = G_line + clefSize*0.35 places curl center on that line
+  // Treble clef — drawn at score position (scrolls away at start)
   const clefSize = LS * 7.5;
   const G4line = staffTop + 3*LS;
-  ctx.fillStyle='rgba(255,255,255,0.85)';
-  ctx.font=`${clefSize}px serif`;
-  ctx.textAlign='left';
-  ctx.textBaseline='alphabetic';
-  ctx.fillText('\uD834\uDD1E', 8, G4line + clefSize * 0.35);
+  const clefX = cursorX - scrollX - clefSize*0.1;
+  if(clefX > -clefSize && clefX < W) {
+    ctx.fillStyle='rgba(255,255,255,0.85)';
+    ctx.font=`${clefSize}px serif`;
+    ctx.textAlign='left';
+    ctx.textBaseline='alphabetic';
+    ctx.fillText('\uD834\uDD1E', clefX, G4line + clefSize * 0.35 - LS);
+  }
 
   requestAnimationFrame(draw);
 }
