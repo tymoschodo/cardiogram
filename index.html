@@ -55,6 +55,10 @@ const CLICK_B64 = "UklGRiTCAQBXQVZFZm10IBAAAAABAAIAgLsAAADcBQAIACAAZGF0YQDCAQD6/
 
 let audioCtx=null, clickBuf=null;
 
+// ── Web Audio lookahead scheduler — works in background tabs ──
+let nextBeatTime = 0;     // audioCtx time of next scheduled beat
+let schedulerRunning = false;
+
 async function initAudio(){
   if(audioCtx) return;
   try{
@@ -63,18 +67,39 @@ async function initAudio(){
     const arr=new Uint8Array(bin.length);
     for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
     clickBuf = await audioCtx.decodeAudioData(arr.buffer);
+    startScheduler();
   }catch(e){console.warn('audio init failed',e);}
 }
 
-function playClick(){
+function scheduleClick(time){
   if(!audioCtx||!clickBuf) return;
-  const snd=localStorage.getItem('pulse_sound');if(snd==='0') return;
+  const snd=localStorage.getItem('pulse_sound');
+  if(snd==='0') return;
   const src=audioCtx.createBufferSource();
   src.buffer=clickBuf;
   const g=audioCtx.createGain();
   g.gain.value=0.65;
   src.connect(g);g.connect(audioCtx.destination);
-  src.start();
+  src.start(time);
+}
+
+function startScheduler(){
+  if(schedulerRunning) return;
+  schedulerRunning=true;
+  nextBeatTime = audioCtx.currentTime + 0.1;
+  // Schedule beats 100ms ahead, run every 25ms — survives background tabs
+  setInterval(()=>{
+    if(!audioCtx||!clickBuf) return;
+    const snd=localStorage.getItem('pulse_sound');
+    if(snd==='0'){ nextBeatTime=audioCtx.currentTime+0.1; return; }
+    const bpm=getBPM();
+    const beatInterval=60/bpm;
+    const lookAhead=0.15; // seconds ahead to schedule
+    while(nextBeatTime < audioCtx.currentTime + lookAhead){
+      scheduleClick(nextBeatTime);
+      nextBeatTime += beatInterval;
+    }
+  }, 25);
 }
 
 document.addEventListener('click',initAudio,{once:true});
@@ -114,8 +139,6 @@ function ecgY(t){
 }
 
 let offset=0, lastTs=null;
-const R_PHASE=0.225;
-let prevPhase=0;
 
 function draw(ts){
   if(lastTs===null) lastTs=ts;
@@ -133,10 +156,7 @@ function draw(ts){
   const pxPerCycle=speed*cycleMs;
   offset+=speed*dt;
 
-  const cur=(offset/pxPerCycle)%1;
-  if(prevPhase<R_PHASE && cur>=R_PHASE) playClick();
-  if(prevPhase>0.9 && cur<0.1) prevPhase=cur;
-  prevPhase=cur;
+  // beat trigger removed — audio handled by Web Audio scheduler
 
   const mid=H*0.5, amp=H*0.32;
 
