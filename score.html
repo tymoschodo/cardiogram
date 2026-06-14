@@ -1,9 +1,9 @@
-<!DOCTYPE html><!-- v8 -->
+<!DOCTYPE html><!-- v9 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Score v8</title>
+<title>Score v9</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Courier New',monospace}
@@ -546,6 +546,8 @@ async function loadMXL(bytes){
   return parseMXML(await xmlFile.async('string'));
 }
 
+let userLoadedFile = false;
+
 async function init(){
   await new Promise((res,rej)=>{
     const s=document.createElement('script');
@@ -554,17 +556,30 @@ async function init(){
     document.head.appendChild(s);
   });
 
-  const bin=atob(MXL_B64);
-  const bytes=new Uint8Array(bin.length);
-  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
-  data=await loadMXL(bytes);
-  document.getElementById('loading').style.display='none';
+  // Only load embedded score if user hasn't already loaded their own file
+  if(!userLoadedFile){
+    const bin=atob(MXL_B64);
+    const bytes=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+    data=await loadMXL(bytes);
+    document.getElementById('loading').style.display='none';
+  }
 
   if(localStorage.getItem('score_autostart')==='1'){
     localStorage.removeItem('score_autostart');
     playing=true;
     document.getElementById('pbtn').innerHTML='&#9646;&#9646; PAUSE';
   }
+
+  // Poll for start signal from settings tab
+  setInterval(()=>{
+    if(localStorage.getItem('score_autostart')==='1'){
+      localStorage.removeItem('score_autostart');
+      playing=true;
+      lastTs=null;
+      document.getElementById('pbtn').innerHTML='&#9646;&#9646; PAUSE';
+    }
+  }, 300);
 }
 
 async function ensureJSZip(){
@@ -580,19 +595,23 @@ async function ensureJSZip(){
 async function handleFile(file){
   if(!file) return;
   const loadingEl = document.getElementById('loading');
-  loadingEl.textContent='LOADING...';
+  loadingEl.innerHTML='<div>LOADING...</div>';
   loadingEl.style.display='flex';
   try {
+    userLoadedFile = true;
     await ensureJSZip();
     const buf=await file.arrayBuffer();
     const isMxl=file.name.toLowerCase().endsWith('.mxl');
-    data = isMxl
+    const newData = isMxl
       ? await loadMXL(new Uint8Array(buf))
       : parseMXML(new TextDecoder().decode(buf));
+    data = newData;
     reset();
     loadingEl.style.display='none';
+    console.log('Loaded:', newData.notes.length, 'notes,', newData.measures.length, 'measures');
   } catch(e) {
-    loadingEl.textContent='ERROR: '+e.message;
+    userLoadedFile = false;
+    loadingEl.innerHTML='<div>ERROR: '+e.message+'</div>';
     console.error(e);
   }
 }
