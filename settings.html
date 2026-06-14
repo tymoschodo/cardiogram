@@ -246,8 +246,8 @@ function setBPM(v){
 function applyNum(){
   setBPM(+document.getElementById('numIn').value);
   if(document.getElementById('scoreToggle').checked){
+    // Signal the score tab to start — it polls localStorage
     localStorage.setItem('score_autostart','1');
-    window.open('score.html','scoreWindow','width=1280,height=400');
     document.getElementById('scoreToggle').checked=false;
     saveScoreToggle();
   }
