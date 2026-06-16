@@ -77,6 +77,13 @@ input[type=range]{
   width:100%;height:3px;background:#e5e5e3;
   border-radius:2px;outline:none;cursor:pointer;margin-bottom:0.25rem
 }
+#volSlider::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:#111;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);cursor:pointer
+}
+#volSlider::-moz-range-thumb{
+  width:16px;height:16px;border-radius:50%;background:#111;border:2px solid #fff;cursor:pointer
+}
 input[type=range]::-webkit-slider-thumb{
   -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
   background:#111;border:2px solid #fff;
@@ -193,6 +200,34 @@ input[type=range]::-moz-range-thumb{
         <div class="toggle-thumb"></div>
       </label>
     </div>
+
+    <div style="height:1px;background:#e5e5e3;margin:1rem 0"></div>
+
+    <div class="sound-row">
+      <div class="sound-info">
+        <span>Metronome</span>
+        <small>Pause / resume the click</small>
+      </div>
+      <button id="metronome-btn" onclick="toggleMetronome()"
+        style="background:#111;color:#fff;border:none;border-radius:6px;
+               font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;
+               padding:0.4rem 1rem;cursor:pointer;transition:background 0.15s">
+        ⏸ Pause
+      </button>
+    </div>
+
+    <div style="height:1px;background:#e5e5e3;margin:1rem 0"></div>
+
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem">
+        <span style="font-size:0.9rem;font-weight:500;color:#111">Volume</span>
+        <span id="vol-val" style="font-family:'Courier New',monospace;font-size:0.75rem;color:#999">80%</span>
+      </div>
+      <input type="range" id="volSlider" min="0" max="100" value="80"
+        oninput="saveVolume(this.value)"
+        style="-webkit-appearance:none;appearance:none;width:100%;height:3px;
+               background:#e5e5e3;border-radius:2px;outline:none;cursor:pointer"/>
+    </div>
   </div>
 
   <div class="card">
@@ -215,6 +250,20 @@ input[type=range]::-moz-range-thumb{
 function getBPM(){return Math.min(220,Math.max(20,parseInt(localStorage.getItem('pulse_bpm')||'72')));}
 function saveBPM(v){localStorage.setItem('pulse_bpm',v);}
 function saveSound(){localStorage.setItem('pulse_sound',document.getElementById('soundToggle').checked?'1':'0');}
+
+function toggleMetronome(){
+  const paused = localStorage.getItem('metronome_paused')==='1';
+  const nowPaused = !paused;
+  localStorage.setItem('metronome_paused', nowPaused?'1':'0');
+  const btn = document.getElementById('metronome-btn');
+  btn.textContent = nowPaused ? '▶ Resume' : '⏸ Pause';
+  btn.style.background = nowPaused ? '#888' : '#111';
+}
+
+function saveVolume(v){
+  localStorage.setItem('pulse_volume', v);
+  document.getElementById('vol-val').textContent = v + '%';
+}
 function saveScoreToggle(){localStorage.setItem('score_prompt',document.getElementById('scoreToggle').checked?'1':'0');}
 
 const ZONES=[
@@ -259,6 +308,14 @@ const initBPM=getBPM();
 setBPM(initBPM);
 const snd=localStorage.getItem('pulse_sound');
 document.getElementById('soundToggle').checked=snd===null||snd==='1';
+const paused=localStorage.getItem('metronome_paused')==='1';
+if(paused){
+  document.getElementById('metronome-btn').textContent='▶ Resume';
+  document.getElementById('metronome-btn').style.background='#888';
+}
+const vol=localStorage.getItem('pulse_volume')||'80';
+document.getElementById('volSlider').value=vol;
+document.getElementById('vol-val').textContent=vol+'%';
 const scp=localStorage.getItem('score_prompt');
 document.getElementById('scoreToggle').checked=scp==='1';
 </script>
